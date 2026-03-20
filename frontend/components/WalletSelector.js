@@ -1,5 +1,5 @@
 /**
- * Wallet Selection Component for KodaPay
+ * Wallet Selection Component for Kodapay
  * Allows users to explicitly choose between Talisman and MetaMask
  */
 
@@ -125,7 +125,7 @@ export default function WalletSelector({ onWalletSelect, onCancel }) {
     <div className="wallet-selector-overlay">
       <div className="wallet-selector-modal">
         <h3>Choose Your Wallet</h3>
-        <p>Select a wallet to connect to KodaPay:</p>
+        <p>Select a wallet to connect to Kodapay:</p>
         
         <div className="wallet-options">
           {availableWallets.map((wallet) => (

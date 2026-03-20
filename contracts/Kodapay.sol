@@ -3,11 +3,8 @@ pragma solidity ^0.8.18;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract KodaPay is ReentrancyGuard {
-    using SafeMath for uint256;
-    
+contract Kodapay is ReentrancyGuard {
     IERC20 public immutable usdtToken;
     
     // Execution fee percentage (1% = 100 basis points)
@@ -51,7 +48,7 @@ contract KodaPay is ReentrancyGuard {
     );
     event SubscriptionCancelled(uint256 indexed subId);
     
-    /// @notice Initializes the KodaPay contract with the USDT token address
+    /// @notice Initializes the Kodapay contract with the USDT token address
     /// @dev Sets the immutable USDT token reference for all subscription payments
     /// @dev SECURITY: Validates token address is not zero to prevent deployment errors
     /// @param _usdtToken Address of the USDT token contract (must be ERC20 compatible)
@@ -75,7 +72,7 @@ contract KodaPay is ReentrancyGuard {
             "Transfer failed"
         );
         
-        userBalances[msg.sender] = userBalances[msg.sender].add(amount);
+        userBalances[msg.sender] = userBalances[msg.sender] + amount;
         emit Deposited(msg.sender, amount);
     }
     
@@ -92,7 +89,7 @@ contract KodaPay is ReentrancyGuard {
         require(amount > 0, "Amount must be greater than 0");
         require(userBalances[msg.sender] >= amount, "Insufficient balance");
         
-        userBalances[msg.sender] = userBalances[msg.sender].sub(amount);
+        userBalances[msg.sender] = userBalances[msg.sender] - amount;
         require(usdtToken.transfer(msg.sender, amount), "Transfer failed");
         
         emit Withdrawn(msg.sender, amount);
@@ -158,7 +155,7 @@ contract KodaPay is ReentrancyGuard {
         // SEGURIDAD: Verificar que el pago sea debido
         if (sub.lastPayment != 0) {
             require(
-                block.timestamp >= sub.lastPayment.add(sub.frequency),
+                block.timestamp >= sub.lastPayment + sub.frequency,
                 "Payment not due yet"
             );
         }
@@ -173,11 +170,11 @@ contract KodaPay is ReentrancyGuard {
         sub.lastPayment = block.timestamp;
         
         // Calcular fee (1% del monto)
-        uint256 executionFee = sub.amount.mul(EXECUTION_FEE_BPS).div(BASIS_POINTS);
-        uint256 netAmount = sub.amount.sub(executionFee);
+        uint256 executionFee = (sub.amount * EXECUTION_FEE_BPS) / BASIS_POINTS;
+        uint256 netAmount = sub.amount - executionFee;
         
         // Deducir del saldo del usuario
-        userBalances[sub.owner] = userBalances[sub.owner].sub(sub.amount);
+        userBalances[sub.owner] = userBalances[sub.owner] - sub.amount;
         
         // Transferir al receptor
         require(usdtToken.transfer(sub.receiver, netAmount), "Transfer to receiver failed");
@@ -223,7 +220,7 @@ contract KodaPay is ReentrancyGuard {
             return true; // First payment
         }
         
-        return block.timestamp >= sub.lastPayment.add(sub.frequency);
+        return block.timestamp >= sub.lastPayment + sub.frequency;
     }
     
     /**
@@ -255,4 +252,3 @@ contract KodaPay is ReentrancyGuard {
         );
     }
 }
-

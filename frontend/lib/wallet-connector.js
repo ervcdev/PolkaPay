@@ -1,5 +1,5 @@
 /**
- * Universal Wallet Connector for KodaPay
+ * Universal Wallet Connector for Kodapay
  * Modern ethers v6 + PAPI integration for professional-grade dApp
  * 
  * ARCHITECTURE:
@@ -99,9 +99,16 @@ export class WalletConnector {
    * Connect to wallet using window.ethereum (universal)
    * @param {string} rpcUrl - RPC endpoint for the network
    * @param {number} targetChainId - Target chain ID
+   * @param {string} networkName - Target network name (for UI / addNetwork)
+   * @param {string} currencySymbol - Native currency symbol
    * @returns {Promise<Object>} Connection result
    */
-  async connectUniversal(rpcUrl = 'http://127.0.0.1:8545', targetChainId = 31337) {
+  async connectUniversal(
+    rpcUrl = 'http://127.0.0.1:8545',
+    targetChainId = 31337,
+    networkName = 'Local Network',
+    currencySymbol = 'WND'
+  ) {
     try {
       // Get the best available provider (prioritizes Talisman)
       const bestProvider = this.getBestProvider()
@@ -152,15 +159,15 @@ export class WalletConnector {
       if (this.chainId !== targetChainId) {
         console.log(`⚠️ Wrong network detected!`)
         console.log(`   Current Chain ID: ${this.chainId}`)
-        console.log(`   Required Chain ID: ${targetChainId} (GoChain - Local Hardhat)`)
+        console.log(`   Required Chain ID: ${targetChainId} (${networkName})`)
         console.log(`🔄 Attempting automatic network switch...`)
         
         try {
-          await this.switchNetwork(targetChainId, rpcUrl)
+          await this.switchNetwork(targetChainId, rpcUrl, networkName, currencySymbol)
           console.log('✅ Network switched successfully!')
         } catch (switchError) {
           console.error('❌ Failed to switch network:', switchError)
-          throw new Error(`Wrong network! Please switch to GoChain (Chain ID: ${targetChainId}) manually in your wallet.\n\nNetwork Name: GoChain\nRPC URL: http://127.0.0.1:8545\nChain ID: 31337\nCurrency Symbol: ETH`)
+          throw new Error(`Wrong network! Please switch to ${networkName} (Chain ID: ${targetChainId}) manually in your wallet.\n\nNetwork Name: ${networkName}\nRPC URL: ${rpcUrl}\nChain ID: ${targetChainId}\nCurrency Symbol: ${currencySymbol}`)
         }
       }
 
@@ -201,8 +208,10 @@ export class WalletConnector {
    * Switch to target network
    * @param {number} chainId - Target chain ID
    * @param {string} rpcUrl - RPC URL for the network
+   * @param {string} networkName - Network name for wallet UI
+   * @param {string} currencySymbol - Native currency symbol
    */
-  async switchNetwork(chainId, rpcUrl) {
+  async switchNetwork(chainId, rpcUrl, networkName = 'Local Network', currencySymbol = 'WND') {
     const hexChainId = `0x${chainId.toString(16)}`
     console.log(`🔄 Switching to Chain ID: ${chainId} (${hexChainId})`)
     
@@ -223,16 +232,16 @@ export class WalletConnector {
       
       // If network doesn't exist, add it
       if (switchError.code === 4902) {
-        console.log('🔧 Network not found, adding GoChain (Local Hardhat)...')
+        console.log(`🔧 Network not found, adding ${networkName}...`)
         try {
           await provider.request({
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: hexChainId,
-              chainName: 'GoChain (Local Hardhat)',
+              chainName: networkName,
               nativeCurrency: {
-                name: 'Ethereum',
-                symbol: 'ETH',
+                name: currencySymbol,
+                symbol: currencySymbol,
                 decimals: 18
               },
               rpcUrls: [rpcUrl],
@@ -251,12 +260,12 @@ export class WalletConnector {
           
         } catch (addError) {
           console.error('❌ Failed to add network:', addError)
-          throw new Error(`Failed to add GoChain to wallet. Please add it manually:\n\nNetwork Name: GoChain\nRPC URL: ${rpcUrl}\nChain ID: ${chainId}\nSymbol: ETH`)
+          throw new Error(`Failed to add ${networkName} to wallet. Please add it manually:\n\nNetwork Name: ${networkName}\nRPC URL: ${rpcUrl}\nChain ID: ${chainId}\nSymbol: ${currencySymbol}`)
         }
       } else if (switchError.code === 4001) {
         // User rejected the request
         console.log('👤 User rejected network switch')
-        throw new Error('Network switch cancelled by user. Please switch to GoChain manually.')
+        throw new Error(`Network switch cancelled by user. Please switch to ${networkName} manually.`)
       } else {
         console.error('❌ Unknown switch error:', switchError)
         throw new Error(`Failed to switch network: ${switchError.message || 'Unknown error'}`)
@@ -339,7 +348,7 @@ export class WalletConnector {
 export const walletConnector = new WalletConnector()
 
 // Export utility functions
-export const connectWallet = (rpcUrl, chainId) => walletConnector.connectUniversal(rpcUrl, chainId)
+export const connectWallet = (rpcUrl, chainId, networkName, currencySymbol) => walletConnector.connectUniversal(rpcUrl, chainId, networkName, currencySymbol)
 export const getWalletBalance = () => walletConnector.getBalance()
 export const createContract = (address, abi) => walletConnector.getContract(address, abi)
 export const disconnectWallet = () => walletConnector.disconnect()

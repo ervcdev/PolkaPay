@@ -1,14 +1,14 @@
 {
-  "name": "polkapay",
+  "name": "kodaplay",
   "version": "1.0.0",
   "description": "Decentralized subscription payments on PVM",
-  "homepage": "https://github.com/ervcdev/PolkaPay#readme",
+  "homepage": "https://github.com/ervcdev/KodaPlay#readme",
   "bugs": {
-    "url": "https://github.com/ervcdev/PolkaPay/issues"
+    "url": "https://github.com/ervcdev/KodaPlay/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ervcdev/PolkaPay.git"
+    "url": "git+https://github.com/ervcdev/KodaPlay.git"
   },
   "license": "ISC",
   "author": "Ervin Castro Perez",
@@ -17,8 +17,8 @@
   "scripts": {
     "test": "npx hardhat test",
     "compile": "npx hardhat compile",
-    "deploy": "npx hardhat run scripts/deploy.js --network westendRevive",
-    "deploy:westend": "npx hardhat run scripts/deploy-westend.js --network westendRevive",
+    "deploy": "npx hardhat run scripts/deploy.js --network westendAssetHub",
+    "deploy:westend": "npx hardhat run scripts/deploy-westend.js --network westendAssetHub",
     "deploy:local": "npx hardhat run scripts/deploy-local.js --network localPVM",
     "start:local-pvm": "./scripts/start-local-pvm.sh",
     "start:local-hardhat": "./scripts/start-local-hardhat.sh",
@@ -27,11 +27,15 @@
     "clean": "hardhat clean",
     "verify": "hardhat verify",
     "gas-report": "REPORT_GAS=true hardhat test"
-
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.15.16",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.16",
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "hardhat": "^2.19.0"
+    "@parity/hardhat-polkadot": "^0.2.7",
+    "@parity/hardhat-polkadot-resolc": "^0.2.3",
+    "@parity/resolc": "^1.0.0",
+    "hardhat": "^2.28.6"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.3",

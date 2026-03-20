@@ -1,8 +1,8 @@
 /**
- * KodaPay Frontend - Talisman Wallet Integration
+ * Kodapay Frontend - Wallet Integration
  * 
  * ¿Qué hace este archivo?
- * Página principal de KodaPay optimizada para Talisman wallet y Westend Revive.
+ * Página principal de Kodapay optimizada para Talisman wallet y Westend Revive.
  * Reemplaza MetaMask con @polkadot/extension-dapp para mejor integración con Polkadot.
  * 
  * ¿Por qué Talisman en lugar de MetaMask?
@@ -28,7 +28,7 @@ import WalletSelector from '../components/WalletSelector'
 // Remove unused PAPI import that was causing issues
 
 // Contract ABIs (simplified for demo)
-const KodaPay_ABI = [
+const KODAPAY_ABI = [
   "function deposit(uint256 amount) external",
   "function withdraw(uint256 amount) external", 
   "function createSubscription(address receiver, uint256 amount, uint256 frequency) external returns (uint256)",
@@ -56,7 +56,7 @@ export default function Home() {
   const [account, setAccount] = useState('')
   const [chainId, setChainId] = useState(null)
   const [balance, setBalance] = useState('0')
-  const [KodaPayContract, setKodaPayContract] = useState(null)
+  const [kodapayContract, setKodapayContract] = useState(null)
   const [usdtContract, setUsdtContract] = useState(null)
   const [loading, setLoading] = useState(false)
   const [showWalletSelector, setShowWalletSelector] = useState(false)
@@ -75,16 +75,22 @@ export default function Home() {
   const [executeSubId, setExecuteSubId] = useState('')
 
   // Contract addresses (read from environment variables)
-  const KodaPay_ADDRESS = process.env.NEXT_PUBLIC_KodaPay_ADDRESS
+  const KODAPAY_ADDRESS = process.env.NEXT_PUBLIC_KODAPAY_ADDRESS
   const USDT_ADDRESS = process.env.NEXT_PUBLIC_USDT_ADDRESS
+  const RPC_URL = process.env.NEXT_PUBLIC_RPC_URL || 'http://127.0.0.1:8545'
+  const TARGET_CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID || 31337)
+  const NETWORK_NAME = process.env.NEXT_PUBLIC_NETWORK_NAME || 'Local Network'
+  const CURRENCY_SYMBOL = process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || 'WND'
   
   // Testing configuration - easy to change for final video
   const FAUCET_AMOUNT = '10'    // Change to '1000' for final video
   const DEMO_MODE = true        // Set to false for production amounts
   
   console.log('🔧 Environment variables loaded:')
-  console.log('  NEXT_PUBLIC_KodaPay_ADDRESS:', process.env.NEXT_PUBLIC_KodaPay_ADDRESS)
+  console.log('  NEXT_PUBLIC_KODAPAY_ADDRESS:', process.env.NEXT_PUBLIC_KODAPAY_ADDRESS)
   console.log('  NEXT_PUBLIC_USDT_ADDRESS:', process.env.NEXT_PUBLIC_USDT_ADDRESS)
+  console.log('  NEXT_PUBLIC_RPC_URL:', process.env.NEXT_PUBLIC_RPC_URL)
+  console.log('  NEXT_PUBLIC_CHAIN_ID:', process.env.NEXT_PUBLIC_CHAIN_ID)
   console.log('🧪 Testing mode:', DEMO_MODE ? `${FAUCET_AMOUNT} mUSDT` : 'Production amounts')
 
   // Initialize client-side only functionality
@@ -143,8 +149,10 @@ export default function Home() {
       
       // Use universal wallet connector with Talisman prioritization
       const result = await connectWallet(
-        'http://127.0.0.1:8545',  // Local Hardhat node
-        31337 // GoChain (Local Hardhat) Chain ID
+        RPC_URL,
+        TARGET_CHAIN_ID,
+        NETWORK_NAME,
+        CURRENCY_SYMBOL
       )
 
       console.log('🔄 Connection result:', result)
@@ -209,17 +217,17 @@ export default function Home() {
       
       // Debug contract addresses
       console.log('🏠 Contract addresses check:')
-      console.log('  KodaPay_ADDRESS:', KodaPay_ADDRESS)
+      console.log('  KODAPAY_ADDRESS:', KODAPAY_ADDRESS)
       console.log('  USDT_ADDRESS:', USDT_ADDRESS)
       
       // Initialize contracts if addresses are available
-      if (KodaPay_ADDRESS) {
-        console.log('🏗️ Creating KodaPay contract with address:', KodaPay_ADDRESS)
-        const KodaPay = createContract(KodaPay_ADDRESS, KodaPay_ABI)
-        setKodaPayContract(KodaPay)
-        console.log('✅ KodaPay contract created')
+      if (KODAPAY_ADDRESS) {
+        console.log('🏗️ Creating Kodapay contract with address:', KODAPAY_ADDRESS)
+        const kodapay = createContract(KODAPAY_ADDRESS, KODAPAY_ABI)
+        setKodapayContract(kodapay)
+        console.log('✅ Kodapay contract created')
       } else {
-        console.warn('⚠️ KodaPay contract address not configured')
+        console.warn('⚠️ Kodapay contract address not configured')
       }
       
       if (USDT_ADDRESS) {
@@ -243,7 +251,7 @@ export default function Home() {
     setAccount('')
     setChainId(null)
     setBalance('0')
-    setKodaPayContract(null)
+    setKodapayContract(null)
     setUsdtContract(null)
     setUsdtBalance('0')
     setVaultBalance('0')
@@ -252,11 +260,11 @@ export default function Home() {
   }
 
   const loadBalances = async () => {
-    if (!usdtContract || !KodaPayContract || !account) return
+    if (!usdtContract || !kodapayContract || !account) return
     
     try {
       const usdtBal = await usdtContract.balanceOf(account)
-      const vaultBal = await KodaPayContract.userBalances(account)
+      const vaultBal = await kodapayContract.userBalances(account)
       
       setUsdtBalance(ethers.formatUnits(usdtBal, 6))
       setVaultBalance(ethers.formatUnits(vaultBal, 6))
@@ -266,15 +274,15 @@ export default function Home() {
   }
 
   const loadSubscriptions = async () => {
-    if (!KodaPayContract || !account) return
+    if (!kodapayContract || !account) return
     
     try {
-      const subIds = await KodaPayContract.getUserSubscriptions(account)
+      const subIds = await kodapayContract.getUserSubscriptions(account)
       const subs = []
       
       for (let id of subIds) {
-        const sub = await KodaPayContract.getSubscription(id)
-        const isDue = await KodaPayContract.isPaymentDue(id)
+        const sub = await kodapayContract.getSubscription(id)
+        const isDue = await kodapayContract.isPaymentDue(id)
         
         subs.push({
           id: id.toString(),
@@ -297,13 +305,13 @@ export default function Home() {
   const handleDeposit = async () => {
     console.log('💳 Deposit button clicked!')
     console.log('🔍 Deposit validation:', {
-      KodaPayContract: !!KodaPayContract,
+      kodapayContract: !!kodapayContract,
       usdtContract: !!usdtContract,
       depositAmount: depositAmount,
-      KodaPay_ADDRESS: KodaPay_ADDRESS
+      KODAPAY_ADDRESS: KODAPAY_ADDRESS
     })
     
-    if (!KodaPayContract || !usdtContract || !depositAmount) {
+    if (!kodapayContract || !usdtContract || !depositAmount) {
       console.error('❌ Missing requirements for deposit')
       alert('Please ensure wallet is connected and amount is entered')
       return
@@ -316,13 +324,13 @@ export default function Home() {
       
       // Step 1: Check current allowance
       console.log('🔍 Checking current allowance...')
-      const currentAllowance = await usdtContract.allowance(account, KodaPay_ADDRESS)
+      const currentAllowance = await usdtContract.allowance(account, KODAPAY_ADDRESS)
       console.log('📊 Current allowance:', ethers.formatUnits(currentAllowance, 6), 'mUSDT')
       
       // Step 2: Approve if needed
       if (currentAllowance < amount) {
         console.log('📝 Approving USDT spending...')
-        const approveTx = await usdtContract.approve(KodaPay_ADDRESS, amount)
+        const approveTx = await usdtContract.approve(KODAPAY_ADDRESS, amount)
         console.log('✅ Approve transaction sent:', approveTx.hash)
         
         console.log('⏳ Waiting for approve confirmation...')
@@ -330,7 +338,7 @@ export default function Home() {
         console.log('✅ Approve confirmed:', approveReceipt.hash)
         
         // Verify allowance was set
-        const newAllowance = await usdtContract.allowance(account, KodaPay_ADDRESS)
+        const newAllowance = await usdtContract.allowance(account, KODAPAY_ADDRESS)
         console.log('📊 New allowance:', ethers.formatUnits(newAllowance, 6), 'mUSDT')
       } else {
         console.log('✅ Sufficient allowance already exists')
@@ -338,7 +346,7 @@ export default function Home() {
       
       // Step 3: Execute deposit
       console.log('🏦 Executing deposit to vault...')
-      const depositTx = await KodaPayContract.deposit(amount)
+      const depositTx = await kodapayContract.deposit(amount)
       console.log('✅ Deposit transaction sent:', depositTx.hash)
       
       console.log('⏳ Waiting for deposit confirmation...')
@@ -371,12 +379,12 @@ export default function Home() {
   }
 
   const handleWithdraw = async () => {
-    if (!KodaPayContract || !withdrawAmount) return
+    if (!kodapayContract || !withdrawAmount) return
     
     setLoading(true)
     try {
       const amount = ethers.parseUnits(withdrawAmount, 6)
-      const tx = await KodaPayContract.withdraw(amount)
+      const tx = await kodapayContract.withdraw(amount)
       await tx.wait()
       
       setWithdrawAmount('')
@@ -390,14 +398,14 @@ export default function Home() {
   }
 
   const handleCreateSubscription = async () => {
-    if (!KodaPayContract || !newSubReceiver || !newSubAmount || !newSubFrequency) return
+    if (!kodapayContract || !newSubReceiver || !newSubAmount || !newSubFrequency) return
     
     setLoading(true)
     try {
       const amount = ethers.parseUnits(newSubAmount, 6)
       const frequency = parseInt(newSubFrequency) * 86400 // Convert days to seconds
       
-      const tx = await KodaPayContract.createSubscription(newSubReceiver, amount, frequency)
+      const tx = await kodapayContract.createSubscription(newSubReceiver, amount, frequency)
       await tx.wait()
       
       setNewSubReceiver('')
@@ -413,11 +421,11 @@ export default function Home() {
   }
 
   const handleExecutePayment = async () => {
-    if (!KodaPayContract || !executeSubId) return
+    if (!kodapayContract || !executeSubId) return
     
     setLoading(true)
     try {
-      const tx = await KodaPayContract.executePayment(executeSubId)
+      const tx = await kodapayContract.executePayment(executeSubId)
       await tx.wait()
       
       setExecuteSubId('')
@@ -483,7 +491,7 @@ export default function Home() {
   if (!isMounted) {
     return (
       <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-        <h1>🚀 KodaPay - Decentralized Subscriptions</h1>
+        <h1>🚀 Kodapay: Subscriptions on Polkadot</h1>
         <p>⏳ Loading Polkadot extensions...</p>
       </div>
     )
@@ -491,7 +499,7 @@ export default function Home() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>🚀 KodaPay - Decentralized Subscriptions</h1>
+      <h1>🚀 Kodapay: Subscriptions on Polkadot</h1>
       
       {!account ? (
         <div>
@@ -511,8 +519,8 @@ export default function Home() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <div>
               <p><strong>Connected:</strong> {account}</p>
-              <p><strong>Network:</strong> Polkadot Hub TestNet (Chain ID: {chainId})</p>
-              <p><strong>Wallet Balance:</strong> {balance} PAS</p>
+              <p><strong>Network:</strong> {NETWORK_NAME} (Chain ID: {chainId})</p>
+              <p><strong>Wallet Balance:</strong> {balance} {CURRENCY_SYMBOL}</p>
               <p><strong>USDT Balance:</strong> {usdtBalance} mUSDT</p>
               <p><strong>Vault Balance:</strong> {vaultBalance} mUSDT</p>
             </div>

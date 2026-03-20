@@ -1,0 +1,127 @@
+# PolkaPay - Exact Library Versions
+# This file serves as a reference for exact versions that work together
+# If something breaks in the future due to library updates, use these versions
+
+# ========================================
+# 🟢 BACKEND DEPENDENCIES (Root package.json)
+# ========================================
+
+# Core Blockchain Libraries
+ethers=6.13.0                           # CRITICAL: v6.x.x for modern syntax
+hardhat=2.19.0                          # CRITICAL: v2.x.x stable release
+@nomicfoundation/hardhat-toolbox=4.0.0  # Hardhat plugin bundle
+
+# Smart Contract Security
+@openzeppelin/contracts=4.9.3           # CRITICAL: v4.x.x (NOT v5.x.x - breaking changes)
+
+# Polkadot Integration  
+@polkadot/extension-dapp=0.62.6         # Wallet connection library
+@polkadot/util-crypto=14.0.1            # Cryptographic utilities
+
+# Environment Management
+dotenv=16.3.1                           # Environment variable loader
+
+# ========================================
+# 🟢 FRONTEND DEPENDENCIES (frontend/package.json)
+# ========================================
+
+# React Framework
+next=13.5.6                             # CRITICAL: v13.x.x (NOT v14.x.x - compatibility issues)
+react=18.2.0                            # React 18 stable
+react-dom=18.2.0                        # React DOM renderer
+
+# Blockchain Integration
+ethers=6.13.0                           # CRITICAL: Same version as backend
+@polkadot/extension-dapp=0.62.6         # CRITICAL: Same version as backend
+@polkadot/util-crypto=14.0.1            # CRITICAL: Same version as backend
+
+# Development Dependencies
+@types/node=20.8.0                      # TypeScript definitions
+@types/react=18.2.0                     # React TypeScript definitions
+@types/react-dom=18.2.0                 # React DOM TypeScript definitions
+eslint=8.51.0                           # Code linting
+eslint-config-next=14.0.0               # Next.js ESLint config
+typescript=5.2.2                        # TypeScript compiler
+
+# Optional Dependencies (for ethers compatibility)
+bufferutil=4.1.0                        # WebSocket optimization
+utf-8-validate=6.0.6                    # UTF-8 validation
+
+# ========================================
+# 🟢 SYSTEM REQUIREMENTS
+# ========================================
+
+# Node.js Runtime
+Node.js >= 18.17.0                      # CRITICAL: v18+ required for ethers v6
+npm >= 9.6.7                            # Package manager
+
+# Operating System
+Linux (Ubuntu 20.04+)                   # Recommended
+macOS (10.15+)                          # Supported
+Windows 10+ (with WSL2)                 # Supported via WSL
+
+# ========================================
+# 🟢 POLKADOT NETWORK CONFIGURATION
+# ========================================
+
+# Network Details
+Network: Polkadot Hub TestNet (Westend Revive)
+RPC URL: https://eth-rpc-testnet.polkadot.io/
+Chain ID: 420420417
+Currency: PAS (Polkadot Asset Hub)
+Block Explorer: https://blockscout-testnet.polkadot.io/
+
+# Faucet
+Testnet Faucet: https://faucet.polkadot.io/
+
+# ========================================
+# 🟢 COMPILER SETTINGS (Hardhat)
+# ========================================
+
+# Solidity Configuration
+Solidity Version: 0.8.18                # Stable version with overflow protection
+EVM Version: london                      # Compatible with PVM
+Optimizer: enabled (200 runs)           # Gas optimization
+Via IR: false                           # Compatibility with PVM
+
+# ========================================
+# 🚨 KNOWN INCOMPATIBLE VERSIONS
+# ========================================
+
+# DO NOT USE - These versions cause issues:
+ethers=5.x.x                            # Old syntax, incompatible
+@openzeppelin/contracts=5.x.x           # Breaking changes in imports
+next=14.x.x                             # transpilePackages issues
+node=16.x.x                             # Insufficient for ethers v6
+hardhat=1.x.x                           # Deprecated
+
+# ========================================
+# 🔧 INSTALLATION COMMANDS
+# ========================================
+
+# Clean Installation (if issues occur)
+rm -rf node_modules package-lock.json
+rm -rf frontend/node_modules frontend/package-lock.json
+npm install
+cd frontend && npm install
+
+# Version Verification
+node --version                          # Should show v18.x.x+
+npm --version                           # Should show v9.x.x+
+npx hardhat --version                   # Should show v2.19.0
+npm list ethers                         # Should show 6.13.0
+
+# ========================================
+# 📅 VERSION LOCK DATE
+# ========================================
+
+# These versions were tested and confirmed working on:
+Date: March 9, 2026
+Environment: Ubuntu 22.04 LTS
+Node.js: v18.17.0
+npm: v9.6.7
+
+# Last Updated: March 9, 2026
+# Status: Production Ready ✅
+# Tested: Full deployment cycle ✅
+# Compatible: Polkadot Hub TestNet ✅

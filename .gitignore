@@ -70,6 +70,15 @@ web_modules/
 .env.*
 !.env.example
 
+# Submission packaging (DoraHacks) - keep repo clean
+.local-bin/
+artifacts/
+cache/
+frontend/
+deployments*.json
+docker-compose.yml
+check-setup.js
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 .parcel-cache
