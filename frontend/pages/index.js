@@ -1,16 +1,16 @@
 /**
  * KodaPay - Web3 Subscription Protocol on Polkadot
- * Ultra-minimalist SaaS Premium UI
+ * Elite SaaS Premium UI with Sidebar Navigation
  */
 
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { walletConnector, connectWallet, createContract, getWalletBalance, disconnectWallet, isConnected } from '../lib/wallet-connector'
+import Sidebar from '../components/Sidebar'
 import Header from '../components/Header'
 import HeroStats from '../components/HeroStats'
-import FaucetBox from '../components/FaucetBox'
-import ManageFunds from '../components/ManageFunds'
 import CreateSubscription from '../components/CreateSubscription'
+import QuickTools from '../components/QuickTools'
 import PaymentExecutor from '../components/PaymentExecutor'
 import SubscriptionsTable from '../components/SubscriptionsTable'
 import Footer from '../components/Footer'
@@ -37,18 +37,22 @@ const USDT_ABI = [
 ]
 
 const styles = {
-  page: {
+  layout: {
+    display: 'flex',
     minHeight: '100vh',
     backgroundColor: '#FFFFFF',
+  },
+  mainWrapper: {
+    flex: 1,
+    marginLeft: '72px',
     display: 'flex',
     flexDirection: 'column',
   },
   main: {
     flex: 1,
+    padding: '32px',
     maxWidth: '1200px',
     width: '100%',
-    margin: '0 auto',
-    padding: '32px 48px',
   },
   welcome: {
     display: 'flex',
@@ -57,35 +61,55 @@ const styles = {
     justifyContent: 'center',
     minHeight: '70vh',
     textAlign: 'center',
+    padding: '48px',
+  },
+  welcomeLogo: {
+    width: '64px',
+    height: '64px',
+    backgroundColor: '#E6007A',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '2px',
+    marginBottom: '32px',
+  },
+  welcomeLogoText: {
+    color: '#FFFFFF',
+    fontWeight: 700,
+    fontSize: '28px',
   },
   welcomeTitle: {
-    fontSize: '48px',
+    fontSize: '42px',
     fontWeight: 700,
-    color: '#121212',
-    letterSpacing: '-1px',
+    color: '#111111',
+    letterSpacing: '-1.5px',
     marginBottom: '16px',
   },
   welcomeTitlePink: {
     color: '#E6007A',
   },
   welcomeText: {
-    fontSize: '18px',
-    color: '#525252',
-    maxWidth: '500px',
+    fontSize: '16px',
+    color: '#737373',
+    maxWidth: '420px',
     marginBottom: '40px',
     lineHeight: 1.7,
   },
   welcomeBtn: {
     padding: '16px 40px',
-    backgroundColor: '#121212',
+    backgroundColor: '#111111',
     color: '#FFFFFF',
     border: 'none',
-    fontSize: '16px',
-    fontWeight: 500,
+    borderRadius: '2px',
+    fontSize: '15px',
+    fontWeight: 600,
     cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
   },
   welcomeHint: {
-    fontSize: '13px',
+    fontSize: '12px',
     color: '#A3A3A3',
     marginTop: '20px',
   },
@@ -93,9 +117,6 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     gap: '24px',
-    marginBottom: '24px',
-  },
-  section: {
     marginBottom: '24px',
   },
   loader: {
@@ -109,7 +130,7 @@ const styles = {
   spinner: {
     width: '32px',
     height: '32px',
-    border: '3px solid #E5E5E5',
+    border: '3px solid #F4F4F5',
     borderTopColor: '#E6007A',
     borderRadius: '50%',
     animation: 'spin 1s linear infinite',
@@ -119,12 +140,92 @@ const styles = {
     color: '#737373',
     fontSize: '14px',
   },
+  depositModal: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1000,
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: '2px',
+    width: '400px',
+    maxWidth: '90%',
+  },
+  modalHeader: {
+    padding: '20px 24px',
+    borderBottom: '1px solid #E5E5E5',
+  },
+  modalTitle: {
+    fontSize: '16px',
+    fontWeight: 600,
+    color: '#111111',
+  },
+  modalBody: {
+    padding: '24px',
+  },
+  modalLabel: {
+    display: 'block',
+    fontSize: '11px',
+    fontWeight: 600,
+    color: '#525252',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    marginBottom: '8px',
+  },
+  modalInput: {
+    width: '100%',
+    padding: '12px 14px',
+    backgroundColor: '#F9F9FB',
+    border: '1px solid #E5E5E5',
+    borderRadius: '2px',
+    fontSize: '14px',
+    fontFamily: "'JetBrains Mono', monospace",
+    color: '#111111',
+  },
+  modalActions: {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '20px',
+  },
+  modalBtn: {
+    flex: 1,
+    padding: '12px 20px',
+    border: 'none',
+    borderRadius: '2px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  modalBtnPrimary: {
+    backgroundColor: '#E6007A',
+    color: '#FFFFFF',
+  },
+  modalBtnSecondary: {
+    backgroundColor: '#F4F4F5',
+    color: '#525252',
+  },
 }
+
+const WalletIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21 12V7H5a2 2 0 010-4h14v4"/>
+    <path d="M3 5v14a2 2 0 002 2h16v-5"/>
+    <path d="M18 12a2 2 0 100 4 2 2 0 000-4z"/>
+  </svg>
+)
 
 export default function Home() {
   // Mounting state
   const [isMounted, setIsMounted] = useState(false)
   const [walletReady, setWalletReady] = useState(false)
+  const [activeTab, setActiveTab] = useState('dashboard')
   
   // Wallet states
   const [account, setAccount] = useState('')
@@ -139,6 +240,9 @@ export default function Home() {
   const [usdtBalance, setUsdtBalance] = useState('0')
   const [vaultBalance, setVaultBalance] = useState('0')
   const [subscriptions, setSubscriptions] = useState([])
+  const [showDepositModal, setShowDepositModal] = useState(false)
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false)
+  const [modalAmount, setModalAmount] = useState('')
   
   // Form states
   const [newSubReceiver, setNewSubReceiver] = useState('')
@@ -287,12 +391,12 @@ export default function Home() {
   }
 
   // Handler functions
-  const handleDeposit = async (amount) => {
-    if (!kodaPayContract || !usdtContract || !amount) return
+  const handleDeposit = async () => {
+    if (!kodaPayContract || !usdtContract || !modalAmount) return
     
     setLoading(true)
     try {
-      const parsedAmount = ethers.parseUnits(amount, 6)
+      const parsedAmount = ethers.parseUnits(modalAmount, 6)
       
       const currentAllowance = await usdtContract.allowance(account, KODAPAY_ADDRESS)
       
@@ -305,22 +409,26 @@ export default function Home() {
       await depositTx.wait()
       
       await loadBalances()
+      setShowDepositModal(false)
+      setModalAmount('')
     } catch (error) {
       console.error('Deposit error:', error)
     }
     setLoading(false)
   }
 
-  const handleWithdraw = async (amount) => {
-    if (!kodaPayContract || !amount) return
+  const handleWithdraw = async () => {
+    if (!kodaPayContract || !modalAmount) return
     
     setLoading(true)
     try {
-      const parsedAmount = ethers.parseUnits(amount, 6)
+      const parsedAmount = ethers.parseUnits(modalAmount, 6)
       const tx = await kodaPayContract.withdraw(parsedAmount)
       await tx.wait()
       
       await loadBalances()
+      setShowWithdrawModal(false)
+      setModalAmount('')
     } catch (error) {
       console.error('Withdrawal error:', error)
     }
@@ -399,6 +507,26 @@ export default function Home() {
     setLoading(false)
   }
 
+  const handleAddToken = async () => {
+    if (!USDT_ADDRESS || !window.ethereum) return
+    
+    try {
+      await window.ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: USDT_ADDRESS,
+            symbol: 'mUSDT',
+            decimals: 6,
+          },
+        },
+      })
+    } catch (error) {
+      console.error('Add token error:', error)
+    }
+  }
+
   // Computed values
   const dueSubscriptions = subscriptions.filter(s => s.active && s.isDue)
   const totalPending = dueSubscriptions.reduce((acc, s) => acc + parseFloat(s.amount), 0).toFixed(2)
@@ -415,108 +543,180 @@ export default function Home() {
   }
 
   return (
-    <div style={styles.page}>
-      <Header
-        account={account}
-        chainId={chainId}
-        loading={loading}
-        walletReady={walletReady}
-        wndBalance={balance}
-        usdtBalance={usdtBalance}
-        onConnect={handleConnectWallet}
-        onDisconnect={handleDisconnectWallet}
-      />
+    <div style={styles.layout}>
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      
+      <div style={styles.mainWrapper}>
+        <Header
+          account={account}
+          chainId={chainId}
+          loading={loading}
+          walletReady={walletReady}
+          wndBalance={balance}
+          usdtBalance={usdtBalance}
+          onConnect={handleConnectWallet}
+          onDisconnect={handleDisconnectWallet}
+        />
 
-      <main style={styles.main}>
-        {!account ? (
-          <div style={styles.welcome}>
-            <h1 style={styles.welcomeTitle}>
-              Koda<span style={styles.welcomeTitlePink}>Pay</span>
-            </h1>
-            <p style={styles.welcomeText}>
-              The decentralized subscription protocol built on Polkadot. 
-              Manage recurring payments on-chain with complete transparency.
-            </p>
-            <button
-              onClick={handleConnectWallet}
-              disabled={!walletReady || loading}
-              style={{
-                ...styles.welcomeBtn,
-                opacity: (!walletReady || loading) ? 0.6 : 1,
-                cursor: (!walletReady || loading) ? 'not-allowed' : 'pointer',
-              }}
-              onMouseOver={(e) => {
-                if (walletReady && !loading) e.target.style.backgroundColor = '#2a2a2a'
-              }}
-              onMouseOut={(e) => {
-                if (walletReady && !loading) e.target.style.backgroundColor = '#121212'
-              }}
-            >
-              {loading ? 'Connecting...' : 'Connect Wallet'}
-            </button>
-            <p style={styles.welcomeHint}>
-              Supports Talisman, SubWallet, MetaMask
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Hero Stats */}
-            <div style={styles.section}>
+        <main style={styles.main}>
+          {!account ? (
+            <div style={styles.welcome}>
+              <div style={styles.welcomeLogo}>
+                <span style={styles.welcomeLogoText}>K</span>
+              </div>
+              <h1 style={styles.welcomeTitle}>
+                Koda<span style={styles.welcomeTitlePink}>Pay</span>
+              </h1>
+              <p style={styles.welcomeText}>
+                The decentralized subscription protocol built for Polkadot. 
+                Manage recurring payments on-chain with complete transparency and security.
+              </p>
+              <button
+                onClick={handleConnectWallet}
+                disabled={!walletReady || loading}
+                style={{
+                  ...styles.welcomeBtn,
+                  opacity: (!walletReady || loading) ? 0.5 : 1,
+                  cursor: (!walletReady || loading) ? 'not-allowed' : 'pointer',
+                }}
+                onMouseOver={(e) => {
+                  if (walletReady && !loading) e.target.style.backgroundColor = '#2a2a2a'
+                }}
+                onMouseOut={(e) => {
+                  if (walletReady && !loading) e.target.style.backgroundColor = '#111111'
+                }}
+              >
+                <WalletIcon />
+                {loading ? 'Connecting...' : 'Connect Wallet'}
+              </button>
+              <p style={styles.welcomeHint}>
+                Supports Talisman, SubWallet, MetaMask
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Hero Stats */}
               <HeroStats
                 vaultBalance={vaultBalance}
                 totalSubscriptions={subscriptions.length}
                 activeSubscriptions={activeSubscriptions}
+                onDeposit={() => setShowDepositModal(true)}
+                onWithdraw={() => setShowWithdrawModal(true)}
               />
-            </div>
 
-            {/* Faucet */}
-            <div style={styles.section}>
-              <FaucetBox onMint={handleFaucet} isLoading={loading} />
-            </div>
+              {/* Main Actions Grid */}
+              <div style={styles.grid2}>
+                <CreateSubscription
+                  receiver={newSubReceiver}
+                  setReceiver={setNewSubReceiver}
+                  amount={newSubAmount}
+                  setAmount={setNewSubAmount}
+                  frequency={newSubFrequency}
+                  setFrequency={setNewSubFrequency}
+                  onCreateSubscription={handleCreateSubscription}
+                  loading={loading}
+                />
+                <QuickTools
+                  onMintFaucet={handleFaucet}
+                  onAddToken={handleAddToken}
+                  loading={loading}
+                  usdtAddress={USDT_ADDRESS}
+                />
+              </div>
 
-            {/* Main Actions Grid */}
-            <div style={styles.grid2}>
-              <ManageFunds
-                onDeposit={handleDeposit}
-                onWithdraw={handleWithdraw}
-                isLoading={loading}
-              />
-              <CreateSubscription
-                receiver={newSubReceiver}
-                setReceiver={setNewSubReceiver}
-                amount={newSubAmount}
-                setAmount={setNewSubAmount}
-                frequency={newSubFrequency}
-                setFrequency={setNewSubFrequency}
-                onCreateSubscription={handleCreateSubscription}
-                loading={loading}
-              />
-            </div>
-
-            {/* Payment Executor */}
-            <div style={styles.section}>
+              {/* Payment Executor */}
               <PaymentExecutor
                 dueSubscriptions={dueSubscriptions.length}
                 totalPending={totalPending}
                 onRunSubscriptions={handleRunAllDue}
                 loading={loading}
               />
-            </div>
 
-            {/* Subscriptions Table */}
-            <div style={styles.section}>
+              {/* Subscriptions Table */}
               <SubscriptionsTable
                 subscriptions={subscriptions}
                 onCancel={handleCancelSubscription}
                 onExecute={handleExecutePayment}
                 loading={loading}
               />
-            </div>
-          </>
-        )}
-      </main>
+            </>
+          )}
+        </main>
 
-      <Footer />
+        <Footer />
+      </div>
+
+      {/* Deposit Modal */}
+      {showDepositModal && (
+        <div style={styles.depositModal} onClick={() => setShowDepositModal(false)}>
+          <div style={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h3 style={styles.modalTitle}>Deposit mUSDT</h3>
+            </div>
+            <div style={styles.modalBody}>
+              <label style={styles.modalLabel}>Amount</label>
+              <input
+                type="number"
+                style={styles.modalInput}
+                placeholder="0.00"
+                value={modalAmount}
+                onChange={(e) => setModalAmount(e.target.value)}
+              />
+              <div style={styles.modalActions}>
+                <button
+                  style={{...styles.modalBtn, ...styles.modalBtnSecondary}}
+                  onClick={() => { setShowDepositModal(false); setModalAmount(''); }}
+                >
+                  Cancel
+                </button>
+                <button
+                  style={{...styles.modalBtn, ...styles.modalBtnPrimary}}
+                  onClick={handleDeposit}
+                  disabled={loading || !modalAmount}
+                >
+                  {loading ? 'Depositing...' : 'Deposit'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Withdraw Modal */}
+      {showWithdrawModal && (
+        <div style={styles.depositModal} onClick={() => setShowWithdrawModal(false)}>
+          <div style={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h3 style={styles.modalTitle}>Withdraw mUSDT</h3>
+            </div>
+            <div style={styles.modalBody}>
+              <label style={styles.modalLabel}>Amount</label>
+              <input
+                type="number"
+                style={styles.modalInput}
+                placeholder="0.00"
+                value={modalAmount}
+                onChange={(e) => setModalAmount(e.target.value)}
+              />
+              <div style={styles.modalActions}>
+                <button
+                  style={{...styles.modalBtn, ...styles.modalBtnSecondary}}
+                  onClick={() => { setShowWithdrawModal(false); setModalAmount(''); }}
+                >
+                  Cancel
+                </button>
+                <button
+                  style={{...styles.modalBtn, ...styles.modalBtnPrimary}}
+                  onClick={handleWithdraw}
+                  disabled={loading || !modalAmount}
+                >
+                  {loading ? 'Withdrawing...' : 'Withdraw'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Wallet Selector Modal */}
       {showWalletSelector && (
