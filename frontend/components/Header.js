@@ -1,32 +1,17 @@
 /**
- * Header Component - KodaPay
- * Sleek top bar with wallet dropdown
+ * Header Component - KodaPay 2077
+ * Futuristic wallet dropdown with glow effects
+ * @version 2.0
  */
 
 import { useState } from 'react';
 
 const styles = {
   header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '16px 32px',
-    backgroundColor: '#FFFFFF',
-    borderBottom: '1px solid #E5E5E5',
-  },
-  title: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#737373',
-  },
-  titleBold: {
-    fontWeight: 600,
-    color: '#111111',
-  },
-  right: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
+    position: 'fixed',
+    top: '20px',
+    right: '32px',
+    zIndex: 1000,
   },
   walletDropdown: {
     position: 'relative',
@@ -36,101 +21,130 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
     padding: '10px 16px',
-    backgroundColor: '#F9F9FB',
-    border: '1px solid #E5E5E5',
-    borderRadius: '2px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '50px',
     cursor: 'pointer',
-    transition: 'all 0.15s ease',
+    transition: 'all 0.2s ease',
   },
   walletButtonHover: {
-    borderColor: '#D4D4D4',
-    backgroundColor: '#F4F4F5',
+    borderColor: 'rgba(230, 0, 122, 0.3)',
+    boxShadow: '0 0 20px rgba(230, 0, 122, 0.15)',
   },
   walletAddress: {
     fontFamily: "'JetBrains Mono', monospace",
-    fontSize: '13px',
-    color: '#111111',
+    fontSize: '12px',
+    color: '#FFFFFF',
+    textShadow: '0 0 10px rgba(230, 0, 122, 0.3)',
   },
   balanceChip: {
     display: 'flex',
     alignItems: 'center',
     gap: '6px',
-    padding: '4px 8px',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #E5E5E5',
-    borderRadius: '2px',
+    padding: '4px 10px',
+    background: 'rgba(230, 0, 122, 0.15)',
+    borderRadius: '20px',
   },
   balanceLabel: {
-    fontSize: '10px',
+    fontSize: '9px',
     fontWeight: 600,
-    color: '#737373',
+    color: 'rgba(255, 255, 255, 0.5)',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   },
   balanceValue: {
     fontFamily: "'JetBrains Mono', monospace",
-    fontSize: '12px',
+    fontSize: '11px',
     fontWeight: 500,
-    color: '#111111',
+    color: '#E6007A',
+    textShadow: '0 0 10px rgba(230, 0, 122, 0.5)',
   },
   chevron: {
-    color: '#737373',
-    transition: 'transform 0.15s ease',
+    color: 'rgba(255, 255, 255, 0.4)',
+    width: '12px',
+    height: '12px',
+    transition: 'transform 0.2s ease',
   },
   chevronOpen: {
     transform: 'rotate(180deg)',
   },
   dropdown: {
     position: 'absolute',
-    top: 'calc(100% + 4px)',
+    top: 'calc(100% + 8px)',
     right: 0,
-    minWidth: '240px',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #E5E5E5',
-    borderRadius: '2px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-    zIndex: 100,
+    minWidth: '260px',
+    background: 'rgba(15, 15, 18, 0.95)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)',
   },
   dropdownSection: {
-    padding: '12px 16px',
-    borderBottom: '1px solid #F4F4F5',
+    padding: '16px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
   },
   dropdownLabel: {
-    fontSize: '10px',
+    fontSize: '9px',
     fontWeight: 600,
-    color: '#A3A3A3',
+    color: 'rgba(255, 255, 255, 0.3)',
     textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    marginBottom: '8px',
+    letterSpacing: '1px',
+    marginBottom: '12px',
   },
   dropdownRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '6px',
+    marginBottom: '8px',
   },
   dropdownRowLast: {
     marginBottom: 0,
   },
   balanceName: {
     fontSize: '13px',
-    color: '#525252',
+    color: 'rgba(255, 255, 255, 0.6)',
   },
   balanceAmount: {
     fontFamily: "'JetBrains Mono', monospace",
     fontSize: '13px',
     fontWeight: 500,
-    color: '#111111',
+    color: '#FFFFFF',
+    textShadow: '0 0 10px rgba(230, 0, 122, 0.3)',
+  },
+  networkBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '6px 10px',
+    background: 'rgba(0, 255, 136, 0.1)',
+    borderRadius: '6px',
+  },
+  networkDot: {
+    width: '6px',
+    height: '6px',
+    backgroundColor: '#00FF88',
+    borderRadius: '50%',
+    boxShadow: '0 0 8px rgba(0, 255, 136, 0.5)',
+  },
+  networkName: {
+    fontSize: '11px',
+    fontWeight: 500,
+    color: '#00FF88',
+    fontFamily: "'JetBrains Mono', monospace",
   },
   disconnectBtn: {
     display: 'block',
     width: '100%',
-    padding: '12px 16px',
-    backgroundColor: 'transparent',
+    padding: '14px 16px',
+    background: 'transparent',
     border: 'none',
     fontSize: '13px',
     fontWeight: 500,
-    color: '#DC2626',
+    color: '#FF3B30',
     textAlign: 'left',
     cursor: 'pointer',
     transition: 'background-color 0.15s ease',
@@ -139,18 +153,24 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    padding: '10px 20px',
-    backgroundColor: '#111111',
+    padding: '12px 24px',
+    background: 'linear-gradient(135deg, #E6007A 0%, #FF1A8C 100%)',
     color: '#FFFFFF',
     border: 'none',
-    borderRadius: '2px',
+    borderRadius: '50px',
     fontSize: '13px',
-    fontWeight: 500',
+    fontWeight: 600,
     cursor: 'pointer',
+    boxShadow: '0 0 30px rgba(230, 0, 122, 0.4)',
+    transition: 'all 0.2s ease',
   },
   connectBtnDisabled: {
     opacity: 0.5,
     cursor: 'not-allowed',
+  },
+  walletIcon: {
+    width: '16px',
+    height: '16px',
   },
 };
 
@@ -168,6 +188,14 @@ const ChevronIcon = ({ isOpen }) => (
     }}
   >
     <polyline points="6,9 12,15 18,9" />
+  </svg>
+);
+
+const WalletIcon = () => (
+  <svg style={styles.walletIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21 12V7H5a2 2 0 010-4h14v4"/>
+    <path d="M3 5v14a2 2 0 002 2h16v-5"/>
+    <path d="M18 12a2 2 0 100 4 2 2 0 000-4z"/>
   </svg>
 );
 
@@ -197,89 +225,83 @@ export default function Header({
   const getNetworkName = () => {
     if (chainId === 31337) return 'Local Testnet';
     if (chainId === 420420421) return 'Westend Revive';
-    return 'Unknown Network';
+    return 'Unknown';
   };
 
   return (
     <header style={styles.header}>
-      <div>
-        <span style={styles.title}>
-          Welcome to <span style={styles.titleBold}>KodaPay</span>
-        </span>
-      </div>
-
-      <div style={styles.right}>
-        {account ? (
-          <div style={styles.walletDropdown}>
-            <button
-              style={{
-                ...styles.walletButton,
-                ...(isHovered ? styles.walletButtonHover : {}),
-              }}
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              <div style={styles.balanceChip}>
-                <span style={styles.balanceLabel}>WND</span>
-                <span style={styles.balanceValue}>{formatBalance(wndBalance)}</span>
-              </div>
-              <span style={styles.walletAddress}>{formatAddress(account)}</span>
-              <ChevronIcon isOpen={isDropdownOpen} />
-            </button>
-
-            {isDropdownOpen && (
-              <div style={styles.dropdown}>
-                <div style={styles.dropdownSection}>
-                  <div style={styles.dropdownLabel}>Network</div>
-                  <div style={{...styles.dropdownRow, ...styles.dropdownRowLast}}>
-                    <span style={styles.balanceName}>{getNetworkName()}</span>
-                  </div>
-                </div>
-                <div style={styles.dropdownSection}>
-                  <div style={styles.dropdownLabel}>Balances</div>
-                  <div style={styles.dropdownRow}>
-                    <span style={styles.balanceName}>WND</span>
-                    <span style={styles.balanceAmount}>{formatBalance(wndBalance)}</span>
-                  </div>
-                  <div style={{...styles.dropdownRow, ...styles.dropdownRowLast}}>
-                    <span style={styles.balanceName}>mUSDT</span>
-                    <span style={styles.balanceAmount}>{formatBalance(usdtBalance)}</span>
-                  </div>
-                </div>
-                <button
-                  style={styles.disconnectBtn}
-                  onClick={() => {
-                    setIsDropdownOpen(false);
-                    onDisconnect();
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#FEF2F2'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
-                >
-                  Disconnect Wallet
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
+      {account ? (
+        <div style={styles.walletDropdown}>
           <button
             style={{
-              ...styles.connectBtn,
-              ...((!walletReady || loading) ? styles.connectBtnDisabled : {}),
+              ...styles.walletButton,
+              ...(isHovered ? styles.walletButtonHover : {}),
             }}
-            onClick={onConnect}
-            disabled={!walletReady || loading}
-            onMouseOver={(e) => {
-              if (walletReady && !loading) e.target.style.backgroundColor = '#2a2a2a';
-            }}
-            onMouseOut={(e) => {
-              if (walletReady && !loading) e.target.style.backgroundColor = '#111111';
-            }}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           >
-            {loading ? 'Connecting...' : 'Connect Wallet'}
+            <div style={styles.balanceChip}>
+              <span style={styles.balanceLabel}>WND</span>
+              <span style={styles.balanceValue}>{formatBalance(wndBalance)}</span>
+            </div>
+            <span style={styles.walletAddress}>{formatAddress(account)}</span>
+            <ChevronIcon isOpen={isDropdownOpen} />
           </button>
-        )}
-      </div>
+
+          {isDropdownOpen && (
+            <div style={styles.dropdown}>
+              <div style={styles.dropdownSection}>
+                <div style={styles.dropdownLabel}>Network</div>
+                <div style={styles.networkBadge}>
+                  <span style={styles.networkDot}></span>
+                  <span style={styles.networkName}>{getNetworkName()}</span>
+                </div>
+              </div>
+              <div style={styles.dropdownSection}>
+                <div style={styles.dropdownLabel}>Balances</div>
+                <div style={styles.dropdownRow}>
+                  <span style={styles.balanceName}>WND</span>
+                  <span style={styles.balanceAmount}>{formatBalance(wndBalance)}</span>
+                </div>
+                <div style={{...styles.dropdownRow, ...styles.dropdownRowLast}}>
+                  <span style={styles.balanceName}>mUSDT</span>
+                  <span style={styles.balanceAmount}>{formatBalance(usdtBalance)}</span>
+                </div>
+              </div>
+              <button
+                style={styles.disconnectBtn}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  onDisconnect();
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(255, 59, 48, 0.1)'}
+                onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+              >
+                Disconnect
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <button
+          style={{
+            ...styles.connectBtn,
+            ...((!walletReady || loading) ? styles.connectBtnDisabled : {}),
+          }}
+          onClick={onConnect}
+          disabled={!walletReady || loading}
+          onMouseOver={(e) => {
+            if (walletReady && !loading) e.target.style.boxShadow = '0 0 40px rgba(230, 0, 122, 0.6)';
+          }}
+          onMouseOut={(e) => {
+            if (walletReady && !loading) e.target.style.boxShadow = '0 0 30px rgba(230, 0, 122, 0.4)';
+          }}
+        >
+          <WalletIcon />
+          {loading ? 'Connecting...' : 'Connect Wallet'}
+        </button>
+      )}
     </header>
   );
 }

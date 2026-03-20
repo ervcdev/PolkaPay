@@ -1,12 +1,12 @@
 /**
- * KodaPay - Web3 Subscription Protocol on Polkadot
- * Elite SaaS Premium UI with Sidebar Navigation
+ * KodaPay - Futuristic Web3 Subscription Protocol
+ * Terminal from 2077 - Clean, Dark, High-Performance
  */
 
 import { useState, useEffect } from 'react'
 import { ethers } from 'ethers'
 import { walletConnector, connectWallet, createContract, getWalletBalance, disconnectWallet, isConnected } from '../lib/wallet-connector'
-import Sidebar from '../components/Sidebar'
+import FloatingNav from '../components/FloatingNav'
 import Header from '../components/Header'
 import HeroStats from '../components/HeroStats'
 import CreateSubscription from '../components/CreateSubscription'
@@ -38,86 +38,90 @@ const USDT_ABI = [
 
 const styles = {
   layout: {
-    display: 'flex',
     minHeight: '100vh',
-    backgroundColor: '#FFFFFF',
-  },
-  mainWrapper: {
-    flex: 1,
-    marginLeft: '72px',
     display: 'flex',
     flexDirection: 'column',
+    position: 'relative',
   },
   main: {
     flex: 1,
-    padding: '32px',
+    padding: '100px 48px 48px',
     maxWidth: '1200px',
     width: '100%',
+    margin: '0 auto',
   },
   welcome: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: '70vh',
+    minHeight: '80vh',
     textAlign: 'center',
     padding: '48px',
   },
   welcomeLogo: {
-    width: '64px',
-    height: '64px',
-    backgroundColor: '#E6007A',
+    width: '80px',
+    height: '80px',
+    background: 'linear-gradient(135deg, #E6007A 0%, #FF1A8C 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: '2px',
-    marginBottom: '32px',
+    borderRadius: '20px',
+    marginBottom: '40px',
+    boxShadow: '0 0 60px rgba(230, 0, 122, 0.4)',
+    animation: 'glow-pulse 3s ease-in-out infinite',
   },
   welcomeLogoText: {
     color: '#FFFFFF',
     fontWeight: 700,
-    fontSize: '28px',
+    fontSize: '36px',
   },
   welcomeTitle: {
-    fontSize: '42px',
+    fontSize: '52px',
     fontWeight: 700,
-    color: '#111111',
-    letterSpacing: '-1.5px',
-    marginBottom: '16px',
+    color: '#FFFFFF',
+    letterSpacing: '-2px',
+    marginBottom: '20px',
   },
   welcomeTitlePink: {
-    color: '#E6007A',
+    background: 'linear-gradient(135deg, #E6007A 0%, #FF1A8C 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
   },
   welcomeText: {
-    fontSize: '16px',
-    color: '#737373',
-    maxWidth: '420px',
-    marginBottom: '40px',
-    lineHeight: 1.7,
+    fontSize: '17px',
+    color: 'rgba(255, 255, 255, 0.5)',
+    maxWidth: '480px',
+    marginBottom: '48px',
+    lineHeight: 1.8,
   },
   welcomeBtn: {
-    padding: '16px 40px',
-    backgroundColor: '#111111',
+    padding: '18px 48px',
+    background: 'linear-gradient(135deg, #E6007A 0%, #FF1A8C 100%)',
     color: '#FFFFFF',
     border: 'none',
-    borderRadius: '2px',
-    fontSize: '15px',
+    borderRadius: '12px',
+    fontSize: '16px',
     fontWeight: 600,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    gap: '12px',
+    boxShadow: '0 0 50px rgba(230, 0, 122, 0.4)',
+    transition: 'all 0.2s ease',
   },
   welcomeHint: {
     fontSize: '12px',
-    color: '#A3A3A3',
-    marginTop: '20px',
+    color: 'rgba(255, 255, 255, 0.3)',
+    marginTop: '24px',
+    fontFamily: "'JetBrains Mono', monospace",
   },
   grid2: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     gap: '24px',
-    marginBottom: '24px',
+    marginBottom: '32px',
   },
   loader: {
     display: 'flex',
@@ -125,20 +129,22 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: '100vh',
-    backgroundColor: '#FFFFFF',
+    background: 'linear-gradient(180deg, #050505 0%, #0A0A0B 100%)',
   },
   spinner: {
-    width: '32px',
-    height: '32px',
-    border: '3px solid #F4F4F5',
+    width: '40px',
+    height: '40px',
+    border: '3px solid rgba(255, 255, 255, 0.1)',
     borderTopColor: '#E6007A',
     borderRadius: '50%',
     animation: 'spin 1s linear infinite',
-    marginBottom: '16px',
+    marginBottom: '20px',
+    boxShadow: '0 0 20px rgba(230, 0, 122, 0.3)',
   },
   loaderText: {
-    color: '#737373',
+    color: 'rgba(255, 255, 255, 0.5)',
     fontSize: '14px',
+    fontFamily: "'JetBrains Mono', monospace",
   },
   depositModal: {
     position: 'fixed',
@@ -146,75 +152,81 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    backdropFilter: 'blur(10px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1000,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: '2px',
-    width: '400px',
+    background: 'rgba(15, 15, 18, 0.95)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '16px',
+    width: '420px',
     maxWidth: '90%',
+    overflow: 'hidden',
   },
   modalHeader: {
-    padding: '20px 24px',
-    borderBottom: '1px solid #E5E5E5',
+    padding: '24px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
   },
   modalTitle: {
-    fontSize: '16px',
+    fontSize: '17px',
     fontWeight: 600,
-    color: '#111111',
+    color: '#FFFFFF',
   },
   modalBody: {
     padding: '24px',
   },
   modalLabel: {
     display: 'block',
-    fontSize: '11px',
+    fontSize: '10px',
     fontWeight: 600,
-    color: '#525252',
+    color: 'rgba(255, 255, 255, 0.4)',
     textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    marginBottom: '8px',
+    letterSpacing: '1px',
+    marginBottom: '10px',
   },
   modalInput: {
     width: '100%',
-    padding: '12px 14px',
-    backgroundColor: '#F9F9FB',
-    border: '1px solid #E5E5E5',
-    borderRadius: '2px',
-    fontSize: '14px',
+    padding: '14px 16px',
+    background: 'rgba(0, 0, 0, 0.3)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '10px',
+    fontSize: '16px',
     fontFamily: "'JetBrains Mono', monospace",
-    color: '#111111',
+    color: '#FFFFFF',
   },
   modalActions: {
     display: 'flex',
     gap: '12px',
-    marginTop: '20px',
+    marginTop: '24px',
   },
   modalBtn: {
     flex: 1,
-    padding: '12px 20px',
+    padding: '14px 24px',
     border: 'none',
-    borderRadius: '2px',
+    borderRadius: '10px',
     fontSize: '14px',
     fontWeight: 600,
     cursor: 'pointer',
+    transition: 'all 0.2s ease',
   },
   modalBtnPrimary: {
-    backgroundColor: '#E6007A',
+    background: 'linear-gradient(135deg, #E6007A 0%, #FF1A8C 100%)',
     color: '#FFFFFF',
+    boxShadow: '0 0 25px rgba(230, 0, 122, 0.3)',
   },
   modalBtnSecondary: {
-    backgroundColor: '#F4F4F5',
-    color: '#525252',
+    background: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    color: 'rgba(255, 255, 255, 0.6)',
   },
 }
 
 const WalletIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <path d="M21 12V7H5a2 2 0 010-4h14v4"/>
     <path d="M3 5v14a2 2 0 002 2h16v-5"/>
     <path d="M18 12a2 2 0 100 4 2 2 0 000-4z"/>
@@ -537,114 +549,112 @@ export default function Home() {
     return (
       <div style={styles.loader}>
         <div style={styles.spinner}></div>
-        <p style={styles.loaderText}>Loading KodaPay...</p>
+        <p style={styles.loaderText}>Initializing KodaPay...</p>
       </div>
     )
   }
 
   return (
     <div style={styles.layout}>
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <FloatingNav activeTab={activeTab} onTabChange={setActiveTab} />
       
-      <div style={styles.mainWrapper}>
-        <Header
-          account={account}
-          chainId={chainId}
-          loading={loading}
-          walletReady={walletReady}
-          wndBalance={balance}
-          usdtBalance={usdtBalance}
-          onConnect={handleConnectWallet}
-          onDisconnect={handleDisconnectWallet}
-        />
+      <Header
+        account={account}
+        chainId={chainId}
+        loading={loading}
+        walletReady={walletReady}
+        wndBalance={balance}
+        usdtBalance={usdtBalance}
+        onConnect={handleConnectWallet}
+        onDisconnect={handleDisconnectWallet}
+      />
 
-        <main style={styles.main}>
-          {!account ? (
-            <div style={styles.welcome}>
-              <div style={styles.welcomeLogo}>
-                <span style={styles.welcomeLogoText}>K</span>
-              </div>
-              <h1 style={styles.welcomeTitle}>
-                Koda<span style={styles.welcomeTitlePink}>Pay</span>
-              </h1>
-              <p style={styles.welcomeText}>
-                The decentralized subscription protocol built for Polkadot. 
-                Manage recurring payments on-chain with complete transparency and security.
-              </p>
-              <button
-                onClick={handleConnectWallet}
-                disabled={!walletReady || loading}
-                style={{
-                  ...styles.welcomeBtn,
-                  opacity: (!walletReady || loading) ? 0.5 : 1,
-                  cursor: (!walletReady || loading) ? 'not-allowed' : 'pointer',
-                }}
-                onMouseOver={(e) => {
-                  if (walletReady && !loading) e.target.style.backgroundColor = '#2a2a2a'
-                }}
-                onMouseOut={(e) => {
-                  if (walletReady && !loading) e.target.style.backgroundColor = '#111111'
-                }}
-              >
-                <WalletIcon />
-                {loading ? 'Connecting...' : 'Connect Wallet'}
-              </button>
-              <p style={styles.welcomeHint}>
-                Supports Talisman, SubWallet, MetaMask
-              </p>
+      <main style={styles.main}>
+        {!account ? (
+          <div style={styles.welcome}>
+            <div style={styles.welcomeLogo}>
+              <span style={styles.welcomeLogoText}>K</span>
             </div>
-          ) : (
-            <>
-              {/* Hero Stats */}
-              <HeroStats
-                vaultBalance={vaultBalance}
-                totalSubscriptions={subscriptions.length}
-                activeSubscriptions={activeSubscriptions}
-                onDeposit={() => setShowDepositModal(true)}
-                onWithdraw={() => setShowWithdrawModal(true)}
-              />
+            <h1 style={styles.welcomeTitle}>
+              Koda<span style={styles.welcomeTitlePink}>Pay</span>
+            </h1>
+            <p style={styles.welcomeText}>
+              The decentralized subscription protocol engineered for Polkadot. 
+              Automate recurring payments on-chain with military-grade security.
+            </p>
+            <button
+              onClick={handleConnectWallet}
+              disabled={!walletReady || loading}
+              style={{
+                ...styles.welcomeBtn,
+                opacity: (!walletReady || loading) ? 0.4 : 1,
+                cursor: (!walletReady || loading) ? 'not-allowed' : 'pointer',
+              }}
+              onMouseOver={(e) => {
+                if (walletReady && !loading) e.target.style.boxShadow = '0 0 70px rgba(230, 0, 122, 0.6)'
+              }}
+              onMouseOut={(e) => {
+                if (walletReady && !loading) e.target.style.boxShadow = '0 0 50px rgba(230, 0, 122, 0.4)'
+              }}
+            >
+              <WalletIcon />
+              {loading ? 'Connecting...' : 'Connect Wallet'}
+            </button>
+            <p style={styles.welcomeHint}>
+              // Supports Talisman, SubWallet, MetaMask
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Hero Stats */}
+            <HeroStats
+              vaultBalance={vaultBalance}
+              totalSubscriptions={subscriptions.length}
+              activeSubscriptions={activeSubscriptions}
+              onDeposit={() => setShowDepositModal(true)}
+              onWithdraw={() => setShowWithdrawModal(true)}
+            />
 
-              {/* Main Actions Grid */}
-              <div style={styles.grid2}>
-                <CreateSubscription
-                  receiver={newSubReceiver}
-                  setReceiver={setNewSubReceiver}
-                  amount={newSubAmount}
-                  setAmount={setNewSubAmount}
-                  frequency={newSubFrequency}
-                  setFrequency={setNewSubFrequency}
-                  onCreateSubscription={handleCreateSubscription}
-                  loading={loading}
-                />
-                <QuickTools
-                  onMintFaucet={handleFaucet}
-                  onAddToken={handleAddToken}
-                  loading={loading}
-                  usdtAddress={USDT_ADDRESS}
-                />
-              </div>
-
-              {/* Payment Executor */}
-              <PaymentExecutor
-                dueSubscriptions={dueSubscriptions.length}
-                totalPending={totalPending}
-                onRunSubscriptions={handleRunAllDue}
+            {/* Main Actions Grid */}
+            <div style={styles.grid2}>
+              <CreateSubscription
+                receiver={newSubReceiver}
+                setReceiver={setNewSubReceiver}
+                amount={newSubAmount}
+                setAmount={setNewSubAmount}
+                frequency={newSubFrequency}
+                setFrequency={setNewSubFrequency}
+                onCreateSubscription={handleCreateSubscription}
                 loading={loading}
               />
-
-              {/* Subscriptions Table */}
-              <SubscriptionsTable
-                subscriptions={subscriptions}
-                onCancel={handleCancelSubscription}
-                onExecute={handleExecutePayment}
+              <QuickTools
+                onMintFaucet={handleFaucet}
+                onAddToken={handleAddToken}
                 loading={loading}
+                usdtAddress={USDT_ADDRESS}
               />
-            </>
-          )}
-        </main>
+            </div>
 
-        <Footer />
-      </div>
+            {/* Payment Executor */}
+            <PaymentExecutor
+              dueSubscriptions={dueSubscriptions.length}
+              totalPending={totalPending}
+              onRunSubscriptions={handleRunAllDue}
+              loading={loading}
+            />
+
+            {/* Subscriptions Table */}
+            <SubscriptionsTable
+              subscriptions={subscriptions}
+              onCancel={handleCancelSubscription}
+              onExecute={handleExecutePayment}
+              loading={loading}
+            />
+          </>
+        )}
+      </main>
+
+      <Footer />
 
       {/* Deposit Modal */}
       {showDepositModal && (
@@ -661,18 +671,38 @@ export default function Home() {
                 placeholder="0.00"
                 value={modalAmount}
                 onChange={(e) => setModalAmount(e.target.value)}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'rgba(230, 0, 122, 0.5)';
+                  e.target.style.boxShadow = '0 0 20px rgba(230, 0, 122, 0.15)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
               <div style={styles.modalActions}>
                 <button
                   style={{...styles.modalBtn, ...styles.modalBtnSecondary}}
                   onClick={() => { setShowDepositModal(false); setModalAmount(''); }}
+                  onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.08)'}
+                  onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.05)'}
                 >
                   Cancel
                 </button>
                 <button
-                  style={{...styles.modalBtn, ...styles.modalBtnPrimary}}
+                  style={{
+                    ...styles.modalBtn, 
+                    ...styles.modalBtnPrimary,
+                    opacity: (loading || !modalAmount) ? 0.4 : 1,
+                  }}
                   onClick={handleDeposit}
                   disabled={loading || !modalAmount}
+                  onMouseOver={(e) => {
+                    if (!loading && modalAmount) e.target.style.boxShadow = '0 0 40px rgba(230, 0, 122, 0.5)';
+                  }}
+                  onMouseOut={(e) => {
+                    if (!loading && modalAmount) e.target.style.boxShadow = '0 0 25px rgba(230, 0, 122, 0.3)';
+                  }}
                 >
                   {loading ? 'Depositing...' : 'Deposit'}
                 </button>
@@ -697,18 +727,38 @@ export default function Home() {
                 placeholder="0.00"
                 value={modalAmount}
                 onChange={(e) => setModalAmount(e.target.value)}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'rgba(230, 0, 122, 0.5)';
+                  e.target.style.boxShadow = '0 0 20px rgba(230, 0, 122, 0.15)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
               <div style={styles.modalActions}>
                 <button
                   style={{...styles.modalBtn, ...styles.modalBtnSecondary}}
                   onClick={() => { setShowWithdrawModal(false); setModalAmount(''); }}
+                  onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.08)'}
+                  onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.05)'}
                 >
                   Cancel
                 </button>
                 <button
-                  style={{...styles.modalBtn, ...styles.modalBtnPrimary}}
+                  style={{
+                    ...styles.modalBtn, 
+                    ...styles.modalBtnPrimary,
+                    opacity: (loading || !modalAmount) ? 0.4 : 1,
+                  }}
                   onClick={handleWithdraw}
                   disabled={loading || !modalAmount}
+                  onMouseOver={(e) => {
+                    if (!loading && modalAmount) e.target.style.boxShadow = '0 0 40px rgba(230, 0, 122, 0.5)';
+                  }}
+                  onMouseOut={(e) => {
+                    if (!loading && modalAmount) e.target.style.boxShadow = '0 0 25px rgba(230, 0, 122, 0.3)';
+                  }}
                 >
                   {loading ? 'Withdrawing...' : 'Withdraw'}
                 </button>
@@ -721,8 +771,8 @@ export default function Home() {
       {/* Wallet Selector Modal */}
       {showWalletSelector && (
         <WalletSelector
-          onWalletSelect={handleWalletSelect}
-          onCancel={() => setShowWalletSelector(false)}
+          onSelect={handleWalletSelect}
+          onClose={() => setShowWalletSelector(false)}
         />
       )}
     </div>

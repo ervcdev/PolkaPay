@@ -1,13 +1,12 @@
 /**
- * Footer Component - KodaPay
- * Minimal footer with PVM-Native badge
+ * Footer Component - KodaPay 2077
+ * Minimal futuristic footer with PVM heartbeat
  */
 
 const styles = {
   footer: {
     padding: '24px 48px',
-    borderTop: '1px solid #E5E5E5',
-    backgroundColor: '#FAFAFA',
+    borderTop: '1px solid rgba(255, 255, 255, 0.05)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -15,41 +14,45 @@ const styles = {
   left: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: '20px',
   },
   copyright: {
-    fontSize: '13px',
-    color: '#737373',
+    fontSize: '12px',
+    color: 'rgba(255, 255, 255, 0.3)',
   },
   badge: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '6px',
-    padding: '6px 12px',
-    backgroundColor: '#FFFFFF',
-    border: '1px solid #E5E5E5',
-    fontSize: '11px',
+    gap: '8px',
+    padding: '8px 14px',
+    background: 'rgba(255, 255, 255, 0.03)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    borderRadius: '8px',
+    fontSize: '10px',
     fontWeight: 600,
     color: '#E6007A',
     textTransform: 'uppercase',
-    letterSpacing: '0.5px',
+    letterSpacing: '1px',
   },
   badgeDot: {
     width: '6px',
     height: '6px',
     borderRadius: '50%',
     backgroundColor: '#E6007A',
+    boxShadow: '0 0 8px rgba(230, 0, 122, 0.5)',
+    animation: 'pulse 2s infinite',
   },
   links: {
     display: 'flex',
     alignItems: 'center',
-    gap: '24px',
+    gap: '28px',
   },
   link: {
-    fontSize: '13px',
-    color: '#737373',
+    fontSize: '12px',
+    color: 'rgba(255, 255, 255, 0.4)',
     textDecoration: 'none',
     cursor: 'pointer',
+    transition: 'all 0.2s ease',
   },
 };
 
@@ -69,24 +72,42 @@ export default function Footer() {
           target="_blank" 
           rel="noopener noreferrer"
           style={styles.link}
-          onMouseOver={(e) => e.target.style.color = '#121212'}
-          onMouseOut={(e) => e.target.style.color = '#737373'}
+          onMouseOver={(e) => {
+            e.target.style.color = '#E6007A';
+            e.target.style.textShadow = '0 0 10px rgba(230, 0, 122, 0.5)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.color = 'rgba(255, 255, 255, 0.4)';
+            e.target.style.textShadow = 'none';
+          }}
         >
           Polkadot
         </a>
         <a 
           href="#" 
           style={styles.link}
-          onMouseOver={(e) => e.target.style.color = '#121212'}
-          onMouseOut={(e) => e.target.style.color = '#737373'}
+          onMouseOver={(e) => {
+            e.target.style.color = '#E6007A';
+            e.target.style.textShadow = '0 0 10px rgba(230, 0, 122, 0.5)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.color = 'rgba(255, 255, 255, 0.4)';
+            e.target.style.textShadow = 'none';
+          }}
         >
           Documentation
         </a>
         <a 
           href="#" 
           style={styles.link}
-          onMouseOver={(e) => e.target.style.color = '#121212'}
-          onMouseOut={(e) => e.target.style.color = '#737373'}
+          onMouseOver={(e) => {
+            e.target.style.color = '#E6007A';
+            e.target.style.textShadow = '0 0 10px rgba(230, 0, 122, 0.5)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.color = 'rgba(255, 255, 255, 0.4)';
+            e.target.style.textShadow = 'none';
+          }}
         >
           GitHub
         </a>
